@@ -21,14 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.request.delete
-import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.put
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -49,7 +41,7 @@ fun MessageBoardScreen() {
     var blobUrl by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
-    // Helper function to handle API operations - no need to modify
+    // Helper function to handle API operations - don't modify
     fun performApiOperation(
         requiresBlobUrl: Boolean = false,
         operation: suspend () -> Unit
@@ -97,11 +89,11 @@ fun MessageBoardScreen() {
         ) {
             ApiButton("GET", requiresBlobUrl = true) {
                 // TODO
-                //  3. Perform a GET operation
+                //  3. Perform a GET operation here and save the response into a `response` variable
                 //  We're not aiming to parse the response as of now, but simply print what it returns
                 //  Hint: Use the `bodyAsText()` to get the response body as text.
 
-//                val response = client.get(blobUrl!!).bodyAsText()
+                //implement here
 
                 // TODO
                 //  Uncomment this after you implement the get operation above
@@ -113,24 +105,23 @@ fun MessageBoardScreen() {
                 //TODO
                 // 1. In order for us to work with something
                 // we first need to post a value
-                // Your task is to build a POST with a json content type
+                // Your task is to build a POST to https://www.jsonblob.com/api/jsonBlob
+                // The content type should be JSON
                 // In the body you should put the `createJsonBody()` function that
                 // we created above which will represent the json we're trying to send
 
-                val response = client.post("https://www.jsonblob.com/api/jsonBlob") {
-                    contentType(ContentType.Application.Json)
-                    setBody(createJsonBody())
-                }
+                //implement here
+
 
                 //TODO
-                // 2. In the header of our response we get a blob URL of our JSON
-                // We need to save it in order to perform further operations
+                // After you have implemented the call above and got the response
+                // in the header of your response you will get a URL of where our JSON will be stored
+                // This URL is called "blob URL".
+                // We need to save this URL in order to perform further operations
                 // Your job is to retrieve this from the header and save it into the
-                // blobUrl variable that we have above.
-                // IMPORTANT(!) - you will need to replace the "http" part in the blob URL with "https"
-                // after you receive it
-
-                blobUrl = response.headers["Location"]?.replace("http", "https")
+                // blobUrl variable that we have at the start of MessageBoardScreen above.
+                // IMPORTANT(!) - once you retrieve the URL from the header
+                // you will need to replace "http" with "https". Don't ask me why it returns "http"
 
 
                 //TODO uncomment this once you implement the above functionality
@@ -139,16 +130,12 @@ fun MessageBoardScreen() {
 
             ApiButton("PUT", requiresBlobUrl = true) {
                 //TODO
-                // 4. Build a PUT operation that takes our blobUrl variable
+                // Build a PUT to the URL that we have saved in the `blobUrl` variable
                 // Make sure to set the contentType as JSON
                 // and the body should be the `createJsonBody()` function that we have above.
-                //  Hint: Use the `bodyAsText()` to get the response body as text.
+                // Hint: Use the `bodyAsText()` to get the response body as text.
 
-                val response = client.put(blobUrl!!) {
-                    contentType(ContentType.Application.Json)
-                    setBody(createJsonBody())
-                }
-
+                //implement here
 
                 //TODO uncomment this after you get the response
 
@@ -158,10 +145,10 @@ fun MessageBoardScreen() {
 
             ApiButton("DELETE", requiresBlobUrl = true) {
                 // TODO
-                //  5. Perform a DELETE operation by supplying our blobUrl as the urlString
+                //  Perform a DELETE with our `blobUrl` as path
                 //  We don't need any response from the delete operation
 
-                client.delete(blobUrl!!)
+                // imlepement here
 
                 // TODO
                 //  Uncomment this after you implement the delete operation above
