@@ -49,7 +49,7 @@ fun MessageBoardScreen() {
     var blobUrl by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
-    // Helper function to handle API operations with consistent error handling
+    // Helper function to handle API operations - no need to modify
     fun performApiOperation(
         requiresBlobUrl: Boolean = false,
         operation: suspend () -> Unit
@@ -67,8 +67,19 @@ fun MessageBoardScreen() {
         }
     }
 
-    // Helper function to create JSON body
+    // Helper function to create JSON body - don't modify
     fun createJsonBody() = """{"message": "$message"}"""
+
+    @Composable
+    fun ApiButton(
+        text: String,
+        requiresBlobUrl: Boolean = false,
+        onClick: suspend () -> Unit
+    ) {
+        Button(onClick = { performApiOperation(requiresBlobUrl, onClick) }) {
+            Text(text)
+        }
+    }
 
     Column(modifier = Modifier.padding(top = 48.dp)) {
         TextField(
@@ -84,84 +95,80 @@ fun MessageBoardScreen() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Button(onClick = {
-                performApiOperation(requiresBlobUrl = true) {
-                    // TODO
-                    //  4. Perform a GET operation
-                    //  We're not aiming to parse the response as of now, but simply print what it returns
-                    //  Hint: Use the `bodyAsText()` to get the response body as text.
+            ApiButton("GET", requiresBlobUrl = true) {
+                // TODO
+                //  3. Perform a GET operation
+                //  We're not aiming to parse the response as of now, but simply print what it returns
+                //  Hint: Use the `bodyAsText()` to get the response body as text.
 
-                    val response = client.get(blobUrl!!).bodyAsText()
-                    statusMessage = "✅ GET success: $response"
-                }
-            }) {
-                Text("GET")
+//                val response = client.get(blobUrl!!).bodyAsText()
+
+                // TODO
+                //  Uncomment this after you implement the get operation above
+
+//                statusMessage = "✅ GET success: $response"
             }
 
-            Button(onClick = {
-                performApiOperation {
+            ApiButton("POST") {
+                //TODO
+                // 1. In order for us to work with something
+                // we first need to post a value
+                // Your task is to build a POST with a json content type
+                // In the body you should put the `createJsonBody()` function that
+                // we created above which will represent the json we're trying to send
 
-                    //TODO
-                    // 1. In order for us to work with something
-                    // we first need to post a value
-                    // Your task is to build a POST with a json content type
-                    // In the body you should put the `createJsonBody()` function that
-                    // we created above which will represent the json we're trying to send
-
-                    val response = client.post("https://www.jsonblob.com/api/jsonBlob") {
-                        contentType(ContentType.Application.Json)
-                        setBody(createJsonBody())
-                    }
-                    // we have to replace further calls with https for this to work
-                    //TODO
-                    // 2. In the header of our response we get a blob URL of our JSON
-                    // We need to save it in order to perform further operations
-                    // Your job is to retrieve this from the header and save it into the
-                    // blobUrl variable that we have above.
-                    // Also, you will need to replace the "http" part in the blob URL with "https"
-
-                    blobUrl = response.headers["Location"]?.replace("http", "https")
-                    statusMessage = "✅ POST success! Blob created with URL = $blobUrl"
+                val response = client.post("https://www.jsonblob.com/api/jsonBlob") {
+                    contentType(ContentType.Application.Json)
+                    setBody(createJsonBody())
                 }
-            }) {
-                Text("POST")
+
+                //TODO
+                // 2. In the header of our response we get a blob URL of our JSON
+                // We need to save it in order to perform further operations
+                // Your job is to retrieve this from the header and save it into the
+                // blobUrl variable that we have above.
+                // IMPORTANT(!) - you will need to replace the "http" part in the blob URL with "https"
+                // after you receive it
+
+                blobUrl = response.headers["Location"]?.replace("http", "https")
+
+
+                //TODO uncomment this once you implement the above functionality
+//                statusMessage = "✅ POST success! Blob created with URL = $blobUrl"
             }
 
-            Button(onClick = {
-                performApiOperation(requiresBlobUrl = true) {
-                    //TODO
-                    // 3. Build a PUT operation that takes our blobUrl variable
-                    // Make sure to set the contentType as JSON
-                    // and the body should be the `createJsonBody()` function that we have above.
+            ApiButton("PUT", requiresBlobUrl = true) {
+                //TODO
+                // 4. Build a PUT operation that takes our blobUrl variable
+                // Make sure to set the contentType as JSON
+                // and the body should be the `createJsonBody()` function that we have above.
+                //  Hint: Use the `bodyAsText()` to get the response body as text.
 
-                    val response = client.put(blobUrl!!) {
-                        contentType(ContentType.Application.Json)
-                        setBody(createJsonBody())
-                    }
-
-//                    statusMessage =
-//                        "✅ PUT success! Status = ${response.status}. Response: ${response.bodyAsText()}"
+                val response = client.put(blobUrl!!) {
+                    contentType(ContentType.Application.Json)
+                    setBody(createJsonBody())
                 }
-            }) {
-                Text("PUT")
+
+
+                //TODO uncomment this after you get the response
+
+//                statusMessage =
+//                    "✅ PUT success! Status = ${response.status}. Response: ${response.bodyAsText()}"
             }
 
-            Button(onClick = {
-                performApiOperation(requiresBlobUrl = true) {
-                    // TODO
-                    //  5. Perform a DELETE operation by supplying our blobUrl as the urlString
+            ApiButton("DELETE", requiresBlobUrl = true) {
+                // TODO
+                //  5. Perform a DELETE operation by supplying our blobUrl as the urlString
+                //  We don't need any response from the delete operation
 
-                    client.delete(blobUrl!!)
-                    statusMessage = "✅ DELETE success. Blob deleted."
-                    blobUrl = null // Reset blob URL after deletion
-                }
-            }) {
-                Text("DELETE")
+                client.delete(blobUrl!!)
+
+                // TODO
+                //  Uncomment this after you implement the delete operation above
+
+//                statusMessage = "✅ DELETE success. Blob deleted."
+//                blobUrl = null // Reset blob URL after deletion
             }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-
         }
 
         Spacer(modifier = Modifier.height(16.dp))
