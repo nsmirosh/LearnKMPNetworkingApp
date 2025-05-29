@@ -85,6 +85,20 @@ fun MessageBoardScreen() {
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(onClick = {
+                performApiOperation(requiresBlobUrl = true) {
+                    // TODO
+                    //  4. Perform a GET operation
+                    //  We're not aiming to parse the response as of now, but simply print what it returns
+                    //  Hint: Use the `bodyAsText()` to get the response body as text.
+
+                    val response = client.get(blobUrl!!).bodyAsText()
+                    statusMessage = "✅ GET success: $response"
+                }
+            }) {
+                Text("GET")
+            }
+
+            Button(onClick = {
                 performApiOperation {
 
                     //TODO
@@ -131,27 +145,6 @@ fun MessageBoardScreen() {
             }) {
                 Text("PUT")
             }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Button(onClick = {
-                performApiOperation(requiresBlobUrl = true) {
-                    // TODO
-                    //  4. Perform a GET operation
-                    //  We're not aiming to parse the response as of now, but simply print what it returns
-                    //  Hint: Use the `bodyAsText()` to get the response body as text.
-
-                    val response = client.get(blobUrl!!).bodyAsText()
-                    statusMessage = "✅ GET success: $response"
-                }
-            }) {
-                Text("GET")
-            }
 
             Button(onClick = {
                 performApiOperation(requiresBlobUrl = true) {
@@ -165,6 +158,10 @@ fun MessageBoardScreen() {
             }) {
                 Text("DELETE")
             }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+
         }
 
         Spacer(modifier = Modifier.height(16.dp))
