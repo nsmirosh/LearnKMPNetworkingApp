@@ -89,26 +89,27 @@ fun MessageBoardScreen() {
         ) {
             ApiButton("GET", requiresBlobUrl = true) {
                 // TODO
-                //  3. Perform a GET operation here and save the response into a `response` variable
-                //  We're not aiming to parse the response as of now, but simply print what it returns
+                //  Perform a GET operation here and save the response into a local `response` variable
+                //  We're not aiming to parse the response as of now, but will simply print what it returns
                 //  Hint: Use the `bodyAsText()` to get the response body as text.
 
                 //implement here
 
                 // TODO
-                //  Uncomment this after you implement the get operation above
+                //  Uncomment the code below after you implemented the GET request above
 
 //                statusMessage = "✅ GET success: $response"
             }
 
             ApiButton("POST") {
                 //TODO
-                // 1. In order for us to work with something
-                // we first need to post a value
-                // Your task is to build a POST to https://www.jsonblob.com/api/jsonBlob
+                // In order for us to work with something
+                // We first need to post a value
+                // Your task is to make a POST request to https://www.jsonblob.com/api/jsonBlob
                 // The content type should be JSON
                 // In the body you should put the `createJsonBody()` function that
-                // we created above which will represent the json we're trying to send
+                // we created above which will take what we have in our TextField
+                // and package it into the JSON format
 
                 //implement here
 
@@ -116,13 +117,12 @@ fun MessageBoardScreen() {
                 //TODO
                 // After you have implemented the call above and got the response
                 // in the header of your response you will get a URL of where our JSON will be stored
-                // This URL is called "blob URL".
                 // We need to save this URL in order to perform further operations
                 // Your job is to retrieve this from the header and save it into the
-                // blobUrl variable that we have at the start of MessageBoardScreen above.
+                // `blobUrl` variable that we have at the start of MessageBoardScreen above.
                 // IMPORTANT(!) - once you retrieve the URL from the header
-                // you will need to replace "http" with "https". Don't ask me why it returns "http"
-
+                // Before storing it you will need to replace "http" with "https".
+                // Don't ask me why it returns "http".
 
                 //TODO uncomment this once you implement the above functionality
 //                statusMessage = "✅ POST success! Blob created with URL = $blobUrl"
@@ -130,10 +130,10 @@ fun MessageBoardScreen() {
 
             ApiButton("PUT", requiresBlobUrl = true) {
                 //TODO
-                // Build a PUT to the URL that we have saved in the `blobUrl` variable
+                // Build a PUT request to the URL that we have saved in the `blobUrl` variable
                 // Make sure to set the contentType as JSON
-                // and the body should be the `createJsonBody()` function that we have above.
-                // Hint: Use the `bodyAsText()` to get the response body as text.
+                // Use the `createJsonBody()` function that we have above for the body.
+                // Save the response into a local `response` variable
 
                 //implement here
 
@@ -148,7 +148,7 @@ fun MessageBoardScreen() {
                 //  Perform a DELETE with our `blobUrl` as path
                 //  We don't need any response from the delete operation
 
-                // imlepement here
+                // implement here
 
                 // TODO
                 //  Uncomment this after you implement the delete operation above
