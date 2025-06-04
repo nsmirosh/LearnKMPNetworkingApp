@@ -101,12 +101,14 @@ fun MessageBoardScreen() {
                 //  We're not aiming to parse the response as of now, but will simply print what it returns
                 //  Hint: Use the `bodyAsText()` to get the response body as text.
 
-                val response = client.get(blobUrl!!).bodyAsText()
+                blobUrl?.let { url ->
+                    val response = client.get(url).bodyAsText()
 
-                // TODO
-                //  Uncomment the code below after you implemented the GET request above
+                    // TODO
+                    //  Uncomment the code below after you implemented the GET request above
 
-                statusMessage = "✅ GET success: $response"
+                    statusMessage = "✅ GET success: $response"
+                }
             }
 
             ApiButton("POST") {
@@ -131,8 +133,7 @@ fun MessageBoardScreen() {
                 // Your job is to retrieve this from the header and save it into the
                 // `blobUrl` variable that we have at the start of MessageBoardScreen above.
                 // IMPORTANT(!) - once you retrieve the URL from the header
-                // Before storing it you will need to replace "http" with "https".
-                // Don't ask me why it returns "http".
+                // Before storing it you will need to replace "http" with "https" for redirection.
 
                 blobUrl = response.headers["Location"]?.replace("http", "https")
 
