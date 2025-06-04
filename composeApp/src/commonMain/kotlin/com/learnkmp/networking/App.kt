@@ -121,8 +121,7 @@ fun MessageBoardScreen() {
                 // Your job is to retrieve this from the header and save it into the
                 // `blobUrl` variable that we have at the start of MessageBoardScreen above.
                 // IMPORTANT(!) - once you retrieve the URL from the header
-                // Before storing it you will need to replace "http" with "https".
-                // Don't ask me why it returns "http".
+                // Before storing it you will need to replace "http" with "https" for redirection.
 
                 //TODO uncomment this once you implement the above functionality
 //                statusMessage = "✅ POST success! Blob created with URL = $blobUrl"
