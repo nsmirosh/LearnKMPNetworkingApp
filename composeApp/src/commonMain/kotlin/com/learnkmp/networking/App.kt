@@ -19,8 +19,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import com.learnkmp.networking.helpers.createHttpClient
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -43,7 +42,7 @@ fun App() {
 @Composable
 @Preview
 fun MessageBoardScreen() {
-    val client = remember { HttpClient(CIO) }
+    val client = remember { createHttpClient() }
     var message by remember { mutableStateOf("") }
     var statusMessage by remember { mutableStateOf("") }
     var blobUrl by remember { mutableStateOf<String?>(null) }
