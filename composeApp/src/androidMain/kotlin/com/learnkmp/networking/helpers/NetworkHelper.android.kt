@@ -5,8 +5,16 @@ import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import okhttp3.Interceptor
 
-actual fun createHttpClient(): HttpClient = HttpClient(OkHttp) {
+actual fun createPlatformHttpClient(): HttpClient = HttpClient(OkHttp) {
+    engine {
+        addInterceptor(
+            LoggingInterceptor()
+        )
+    }
+}
+
     install(ContentNegotiation) {
         json(Json {
             prettyPrint = true

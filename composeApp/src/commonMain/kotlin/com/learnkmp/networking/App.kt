@@ -22,7 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.learnkmp.networking.helpers.createHttpClient
+import com.learnkmp.networking.helpers.createPlatformHttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 
@@ -43,7 +44,6 @@ const val MAX_MESSAGES = 3
 data class Note(
     val message: String,
     val author: String? = null,
-    val timestamp: String
 )
 
 @Composable
@@ -57,7 +57,7 @@ fun App() {
 @Composable
 @Preview
 fun NoteTakingScreen() {
-    val client = remember { createHttpClient() }
+    val client = remember { createPlatformHttpClient() }
     var message by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
     var statusMessage by remember { mutableStateOf("") }
@@ -85,11 +85,11 @@ fun NoteTakingScreen() {
     fun sendNote() {
         coroutineScope.launch {
             try {
-                val timestamp = Clock.System.now().toString()
+//                val timestamp = Clock.System.now().toString()
                 val note = Note(
                     message = message,
                     author = author.ifBlank { null },
-                    timestamp = timestamp
+//                    timestamp = timestamp
                 )
 
                 val response = client.post(BLOB_WEBSITE_URL) {
@@ -199,14 +199,15 @@ fun NoteCard(note: Note) {
                 )
             }
 
-            Text(
-                text = formatTimestamp(note.timestamp),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+//            Text(
+//                text = formatTimestamp(note.timestamp),
+//                style = MaterialTheme.typography.bodySmall,
+//                color = MaterialTheme.colorScheme.onSurfaceVariant
+//            )
         }
     }
 }
+//TODO implement automatic serialization to Dates / other objects
 
 fun formatTimestamp(timestamp: String): String {
     return try {
