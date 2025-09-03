@@ -1,5 +1,6 @@
 package com.learnkmp.networking
 
+import NoteViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,102 +16,35 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.learnkmp.networking.helpers.createPlatformHttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
-import kotlinx.serialization.Serializable
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.learnkmp.networking.models.Note
 
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-
-const val BLOB_WEBSITE_URL = "https://www.jsonblob.com/api/jsonBlob"
-const val MAX_MESSAGES = 3
-
-@Serializable
-data class Note(
-    val message: String,
-    val author: String? = null,
-)
 
 @Composable
 @Preview
 fun App() {
     MaterialTheme {
-        NoteTakingScreen()
+        NoteScreen()
     }
 }
 
+
 @Composable
 @Preview
-fun NoteTakingScreen() {
-    val client = remember { createPlatformHttpClient() }
-    var message by remember { mutableStateOf("") }
+fun NoteScreen(viewModel: NoteViewModel = viewModel { NoteViewModel() }) {
+    val notes by viewModel.notes.collectAsState()
+    val statusMessage by viewModel.statusMessage.collectAsState()
+    var noteText by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
-    var statusMessage by remember { mutableStateOf("") }
-    var notesBlobUrls by remember { mutableStateOf<List<String>>(emptyList()) }
-    var notes by remember { mutableStateOf<List<Note>>(emptyList()) }
-    val coroutineScope = rememberCoroutineScope()
-
-    suspend fun fetchAllNotes() {
-        try {
-            val fetchedNotes = mutableListOf<Note>()
-            notesBlobUrls.forEach { url ->
-                try {
-                    val note: Note = client.get(url).body()
-                    fetchedNotes.add(note)
-                } catch (e: Exception) {
-                    // Ignore individual fetch failures
-                }
-            }
-            notes = fetchedNotes
-        } catch (e: Exception) {
-            statusMessage = "❌ Failed to fetch notes: ${e.message}"
-        }
-    }
-
-    fun sendNote() {
-        coroutineScope.launch {
-            try {
-                val note = Note(
-                    message = message,
-                    author = author.ifBlank { null },
-                )
-
-                val response = client.post(BLOB_WEBSITE_URL) {
-                    contentType(ContentType.Application.Json)
-                    setBody(note)
-                }
-
-                response.headers["Location"]?.replace("http", "https")?.let { blobUrl ->
-                    //Taking only the last 3 messages to avoid making too many network calls at once.
-                    notesBlobUrls = (notesBlobUrls + blobUrl).takeLast(MAX_MESSAGES)
-                    statusMessage = "✅ Note sent successfully!"
-                    message = ""
-                    author = ""
-                }
-
-                // Fetch all notes after sending
-                fetchAllNotes()
-
-            } catch (e: Exception) {
-                statusMessage = "❌ Failed to send note: ${e.message}"
-            }
-        }
-    }
-
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
@@ -120,8 +54,8 @@ fun NoteTakingScreen() {
         )
 
         TextField(
-            value = message,
-            onValueChange = { message = it },
+            value = noteText,
+            onValueChange = { noteText = it },
             label = { Text("Message") },
             modifier = Modifier.fillMaxWidth(),
             minLines = 2
@@ -139,8 +73,12 @@ fun NoteTakingScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { sendNote() },
-            enabled = message.isNotBlank(),
+            onClick = {
+                viewModel.sendNote(noteText, author)
+                noteText = ""
+                author = ""
+            },
+            enabled = noteText.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Send")
@@ -148,10 +86,10 @@ fun NoteTakingScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (statusMessage.isNotEmpty()) {
+        statusMessage?.let {
             Text(
-                text = statusMessage,
-                color = if (statusMessage.startsWith("✅")) MaterialTheme.colorScheme.primary
+                text = it,
+                color = if (it.startsWith("✅")) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.error,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -167,10 +105,13 @@ fun NoteTakingScreen() {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(notes) { NoteCard(it) }
+                items(notes.takeLast(3).reversed()) { note ->
+                    NoteCard(note = note)
+                }
             }
         }
     }
+
 }
 
 @Composable
@@ -194,16 +135,7 @@ fun NoteCard(note: Note) {
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
-        }
-    }
-}
-//TODO implement automatic serialization to Dates / other objects
 
-fun formatTimestamp(timestamp: String): String {
-    return try {
-        val instant = Instant.parse(timestamp)
-        instant.toString().replace("T", " ").replace("Z", "").substringBefore(".")
-    } catch (e: Exception) {
-        timestamp
+        }
     }
 }
