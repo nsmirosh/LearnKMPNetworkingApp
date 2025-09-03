@@ -84,11 +84,9 @@ fun NoteTakingScreen() {
     fun sendNote() {
         coroutineScope.launch {
             try {
-//                val timestamp = Clock.System.now().toString()
                 val note = Note(
                     message = message,
                     author = author.ifBlank { null },
-//                    timestamp = timestamp
                 )
 
                 val response = client.post(BLOB_WEBSITE_URL) {
@@ -196,12 +194,6 @@ fun NoteCard(note: Note) {
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
-
-//            Text(
-//                text = formatTimestamp(note.timestamp),
-//                style = MaterialTheme.typography.bodySmall,
-//                color = MaterialTheme.colorScheme.onSurfaceVariant
-//            )
         }
     }
 }
