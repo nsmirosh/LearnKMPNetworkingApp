@@ -30,7 +30,6 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
@@ -61,14 +60,14 @@ fun NoteTakingScreen() {
     var message by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
     var statusMessage by remember { mutableStateOf("") }
-    var blobUrls by remember { mutableStateOf<List<String>>(emptyList()) }
+    var notesBlobUrls by remember { mutableStateOf<List<String>>(emptyList()) }
     var notes by remember { mutableStateOf<List<Note>>(emptyList()) }
     val coroutineScope = rememberCoroutineScope()
 
     suspend fun fetchAllNotes() {
         try {
             val fetchedNotes = mutableListOf<Note>()
-            blobUrls.forEach { url ->
+            notesBlobUrls.forEach { url ->
                 try {
                     val note: Note = client.get(url).body()
                     fetchedNotes.add(note)
@@ -98,7 +97,8 @@ fun NoteTakingScreen() {
                 }
 
                 response.headers["Location"]?.replace("http", "https")?.let { blobUrl ->
-                    blobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
+                    //Taking only the last 3 messages to avoid making too many network calls at once.
+                    notesBlobUrls = (notesBlobUrls + blobUrl).takeLast(MAX_MESSAGES)
                     statusMessage = "✅ Note sent successfully!"
                     message = ""
                     author = ""
@@ -169,9 +169,7 @@ fun NoteTakingScreen() {
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(notes.takeLast(3).reversed()) { note ->
-                    NoteCard(note = note)
-                }
+                items(notes) { NoteCard(it) }
             }
         }
     }
