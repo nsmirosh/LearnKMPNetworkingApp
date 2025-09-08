@@ -2,6 +2,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.learnkmp.networking.helpers.createPlatformHttpClient
 import com.learnkmp.networking.models.Note
+import com.learnkmp.networking.models.Metadata
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -12,7 +13,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 const val BLOB_WEBSITE_URL = "https://www.jsonblob.com/api/jsonBlob"
 const val MAX_MESSAGES = 3
@@ -45,12 +47,22 @@ class NoteViewModel : ViewModel() {
         }
     }
 
-    fun sendNote(message: String, author: String) {
+    @OptIn(ExperimentalTime::class)
+    fun sendNote(message: String, author: String, tags: String = "") {
         viewModelScope.launch {
             try {
+                val tagsList = if (tags.isBlank()) null else tags.split(",").map { it.trim() }
+                    .filter { it.isNotEmpty() }
+
+                val metadata = Metadata(
+                    timestamp = Clock.System.now(),
+                    tags = tagsList
+                )
+
                 val note = Note(
                     message = message,
                     author = author.ifBlank { null },
+                    metadata = metadata
                 )
 
                 val response = client.post(BLOB_WEBSITE_URL) {

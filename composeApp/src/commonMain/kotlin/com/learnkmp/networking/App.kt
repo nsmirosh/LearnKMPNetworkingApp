@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -18,13 +21,17 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learnkmp.networking.models.Note
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.TimeZone
 
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -45,6 +52,7 @@ fun NoteScreen(viewModel: NoteViewModel = viewModel { NoteViewModel() }) {
     val statusMessage by viewModel.statusMessage.collectAsState()
     var noteText by remember { mutableStateOf("") }
     var author by remember { mutableStateOf("") }
+    var tags by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
@@ -70,13 +78,24 @@ fun NoteScreen(viewModel: NoteViewModel = viewModel { NoteViewModel() }) {
             modifier = Modifier.fillMaxWidth()
         )
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        TextField(
+            value = tags,
+            onValueChange = { tags = it },
+            label = { Text("Tags (comma separated, optional)") },
+            placeholder = { Text("work, urgent, ideas") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
-                viewModel.sendNote(noteText, author)
+                viewModel.sendNote(noteText, author, tags)
                 noteText = ""
                 author = ""
+                tags = ""
             },
             enabled = noteText.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
@@ -114,6 +133,17 @@ fun NoteScreen(viewModel: NoteViewModel = viewModel { NoteViewModel() }) {
 
 }
 
+@OptIn(ExperimentalTime::class)
+fun formatTimestamp(instant: Instant): String {
+    val kotlinxInstant =
+        kotlinx.datetime.Instant.fromEpochMilliseconds(instant.toEpochMilliseconds())
+    val localDateTime = kotlinxInstant.toLocalDateTime(TimeZone.currentSystemDefault())
+    return "${localDateTime.date} at ${
+        localDateTime.hour.toString().padStart(2, '0')
+    }:${localDateTime.minute.toString().padStart(2, '0')}"
+}
+
+@OptIn(ExperimentalTime::class)
 @Composable
 fun NoteCard(note: Note) {
     Card(
@@ -132,10 +162,36 @@ fun NoteCard(note: Note) {
                     text = "— ${note.author}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
 
+            Text(
+                text = "⏰ ${formatTimestamp(note.metadata.timestamp)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            if (note.metadata.tags != null && note.metadata.tags!!.isNotEmpty()) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    items(note.metadata.tags!!) { tag ->
+                        Text(
+                            text = tag,
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = RoundedCornerShape(16.dp)
+                                )
+                                .padding(horizontal = 12.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+            }
         }
     }
 }
