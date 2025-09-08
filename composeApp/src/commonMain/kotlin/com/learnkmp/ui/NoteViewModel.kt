@@ -54,15 +54,12 @@ class NoteViewModel : ViewModel() {
                 val tagsList = if (tags.isBlank()) null else tags.split(",").map { it.trim() }
                     .filter { it.isNotEmpty() }
 
-                val metadata = Metadata(
-                    timestamp = Clock.System.now(),
-                    tags = tagsList
-                )
+
+                //TODO use tagsList above to add tags to your Metadata
 
                 val note = Note(
                     message = message,
                     author = author.ifBlank { null },
-                    metadata = metadata
                 )
 
                 val response = client.post(BLOB_WEBSITE_URL) {
