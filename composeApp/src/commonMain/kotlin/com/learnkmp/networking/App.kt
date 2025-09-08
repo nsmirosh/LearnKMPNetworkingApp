@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learnkmp.networking.models.Note
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.time.ExperimentalTime
 
 
 @Composable
@@ -38,7 +39,6 @@ fun App() {
         NoteScreen()
     }
 }
-
 
 @Composable
 @Preview
@@ -125,7 +125,6 @@ fun NoteScreen(viewModel: NoteViewModel = viewModel { NoteViewModel() }) {
             }
         }
     }
-
 }
 
 @Composable
@@ -150,25 +149,32 @@ fun NoteCard(note: Note) {
                 )
             }
 
-            if (note.metadata.tags != null && note.metadata.tags!!.isNotEmpty()) {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    items(note.metadata.tags!!) { tag ->
-                        Text(
-                            text = tag,
-                            modifier = Modifier
-                                .background(
-                                    color = MaterialTheme.colorScheme.primaryContainer,
-                                    shape = RoundedCornerShape(16.dp)
-                                )
-                                .padding(horizontal = 12.dp, vertical = 4.dp),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                }
+            note.metadata.tags?.let {
+                Bubbles(it)
             }
         }
     }
+}
+
+
+@Composable
+fun Bubbles(tags: List<String>) {
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        items(tags) { tag ->
+            Text(
+                text = tag,
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        shape = RoundedCornerShape(16.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
+    }
+
 }

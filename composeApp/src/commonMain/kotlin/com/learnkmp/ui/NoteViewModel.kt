@@ -1,8 +1,8 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.learnkmp.networking.helpers.createPlatformHttpClient
-import com.learnkmp.networking.models.Metadata
 import com.learnkmp.networking.models.Note
+import com.learnkmp.networking.models.Metadata
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
