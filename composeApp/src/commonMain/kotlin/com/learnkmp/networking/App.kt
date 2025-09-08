@@ -40,7 +40,6 @@ fun App() {
     }
 }
 
-
 @Composable
 @Preview
 fun NoteScreen(viewModel: NoteViewModel = viewModel { NoteViewModel() }) {
@@ -126,10 +125,8 @@ fun NoteScreen(viewModel: NoteViewModel = viewModel { NoteViewModel() }) {
             }
         }
     }
-
 }
 
-@OptIn(ExperimentalTime::class)
 @Composable
 fun NoteCard(note: Note) {
     Card(
@@ -150,7 +147,6 @@ fun NoteCard(note: Note) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-
 
                 //TODO once you've got the Metadata - simply pass the tags to the Bubbles Composable
                 // below
