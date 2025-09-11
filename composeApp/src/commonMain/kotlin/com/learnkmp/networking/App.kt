@@ -136,7 +136,7 @@ fun NoteScreen(viewModel: NoteViewModel = viewModel { NoteViewModel() }) {
 @OptIn(ExperimentalTime::class)
 fun formatTimestamp(instant: Instant): String {
     val kotlinxInstant =
-        kotlinx.datetime.Instant.fromEpochMilliseconds(instant.toEpochMilliseconds())
+        Instant.fromEpochMilliseconds(instant.toEpochMilliseconds())
     val localDateTime = kotlinxInstant.toLocalDateTime(TimeZone.currentSystemDefault())
     return "${localDateTime.date} at ${
         localDateTime.hour.toString().padStart(2, '0')
