@@ -27,7 +27,7 @@ class NoteViewModel : ViewModel() {
     val statusMessage: StateFlow<String?> = _statusMessage.asStateFlow()
 
     val blobUrls = mutableListOf<String>()
-    val client = createPlatformHttpClient { blobUrl ->
+    val client = createPlatformHttpClient2 { blobUrl ->
         val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
         blobUrls.clear()
         blobUrls.addAll(newBlobUrls)
