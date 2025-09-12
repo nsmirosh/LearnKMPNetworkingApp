@@ -1,6 +1,7 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.learnkmp.networking.helpers.createPlatformHttpClient
+import com.learnkmp.networking.helpers.createPlatformHttpClient2
 import com.learnkmp.networking.models.Note
 import com.learnkmp.networking.models.Metadata
 import io.ktor.client.call.body
@@ -13,8 +14,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 const val BLOB_WEBSITE_URL = "https://www.jsonblob.com/api/jsonBlob"
 const val MAX_MESSAGES = 3
@@ -28,7 +27,12 @@ class NoteViewModel : ViewModel() {
     val statusMessage: StateFlow<String?> = _statusMessage.asStateFlow()
 
     val blobUrls = mutableListOf<String>()
-    val client = createPlatformHttpClient()
+    val client = createPlatformHttpClient { blobUrl ->
+        val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
+        blobUrls.clear()
+        blobUrls.addAll(newBlobUrls)
+        _statusMessage.value = "✅ Note sent successfully!"
+    }
 
     suspend fun fetchAllNotes() {
         try {
@@ -47,7 +51,6 @@ class NoteViewModel : ViewModel() {
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     fun sendNote(message: String, author: String, tags: String = "") {
         viewModelScope.launch {
             try {
@@ -55,7 +58,6 @@ class NoteViewModel : ViewModel() {
                     .filter { it.isNotEmpty() }
 
                 val metadata = Metadata(
-                    timestamp = Clock.System.now(),
                     tags = tagsList
                 )
 
@@ -65,16 +67,9 @@ class NoteViewModel : ViewModel() {
                     metadata = metadata
                 )
 
-                val response = client.post(BLOB_WEBSITE_URL) {
+                client.post(BLOB_WEBSITE_URL) {
                     contentType(ContentType.Application.Json)
                     setBody(note)
-                }
-
-                response.headers["Location"]?.replace("http", "https")?.let { blobUrl ->
-                    val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
-                    blobUrls.clear()
-                    blobUrls.addAll(newBlobUrls)
-                    _statusMessage.value = "✅ Note sent successfully!"
                 }
 
                 // Fetch all notes after sending

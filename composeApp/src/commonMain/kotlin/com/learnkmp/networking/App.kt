@@ -1,6 +1,7 @@
 package com.learnkmp.networking
 
 import NoteViewModel
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -21,19 +21,15 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.learnkmp.networking.models.Note
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
-import kotlinx.datetime.toLocalDateTime
-import kotlinx.datetime.TimeZone
-
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import kotlin.time.ExperimentalTime
 
 
 @Composable
@@ -134,16 +130,6 @@ fun NoteScreen(viewModel: NoteViewModel = viewModel { NoteViewModel() }) {
 }
 
 @OptIn(ExperimentalTime::class)
-fun formatTimestamp(instant: Instant): String {
-    val kotlinxInstant =
-        Instant.fromEpochMilliseconds(instant.toEpochMilliseconds())
-    val localDateTime = kotlinxInstant.toLocalDateTime(TimeZone.currentSystemDefault())
-    return "${localDateTime.date} at ${
-        localDateTime.hour.toString().padStart(2, '0')
-    }:${localDateTime.minute.toString().padStart(2, '0')}"
-}
-
-@OptIn(ExperimentalTime::class)
 @Composable
 fun NoteCard(note: Note) {
     Card(
@@ -166,18 +152,11 @@ fun NoteCard(note: Note) {
                 )
             }
 
-            Text(
-                text = "⏰ ${formatTimestamp(note.metadata.timestamp)}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
-
-            if (note.metadata.tags != null && note.metadata.tags!!.isNotEmpty()) {
+            if (note.metadata.tags != null) {
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    items(note.metadata.tags!!) { tag ->
+                    items(note.metadata.tags) { tag ->
                         Text(
                             text = tag,
                             modifier = Modifier

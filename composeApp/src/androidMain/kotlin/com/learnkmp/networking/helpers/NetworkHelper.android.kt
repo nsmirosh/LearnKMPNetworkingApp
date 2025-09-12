@@ -2,39 +2,51 @@ package com.learnkmp.networking.helpers
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.observer.ResponseObserver
+import io.ktor.client.plugins.plugin
+import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.contextual
-import kotlin.time.Instant
-import kotlin.time.ExperimentalTime
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 
-@OptIn(ExperimentalTime::class)
-object InstantSerializer : KSerializer<Instant> {
-    override val descriptor = PrimitiveSerialDescriptor("Instant", PrimitiveKind.STRING)
-
-    override fun serialize(encoder: Encoder, value: Instant) {
-        encoder.encodeString(value.toString())
-    }
-
-    override fun deserialize(decoder: Decoder): Instant {
-        return Instant.parse(decoder.decodeString())
-    }
-}
-
-@OptIn(ExperimentalTime::class)
-actual fun createPlatformHttpClient(): HttpClient = HttpClient(OkHttp) {
-    install(ContentNegotiation) {
-        json(Json {
-            serializersModule = SerializersModule {
-                contextual(InstantSerializer)
+actual fun createPlatformHttpClient(onNewBlobUrl: (String) -> Unit): HttpClient =
+    HttpClient(OkHttp) {
+        install(ContentNegotiation) {
+            json(
+                Json {
+                    prettyPrint = true
+                    isLenient = true
+                    ignoreUnknownKeys = true
+                }
+            )
+        }
+        install(ResponseObserver) {
+            onResponse { response ->
+                if (response.call.request.method == HttpMethod.Post) {
+                    response.headers["Location"]?.replace("http", "https")
+                        ?.let { onNewBlobUrl(it) }
+                }
             }
-        })
+        }
     }
+
+actual fun createPlatformHttpClient2(onNewBlobUrl: (String) -> Unit): HttpClient {
+    val client = HttpClient(OkHttp) {
+        install(ContentNegotiation) {
+            json(Json {
+                prettyPrint = true
+                isLenient = true
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+    client.plugin(HttpSend).intercept { request ->
+        val call = execute(request)
+        if (request.method == HttpMethod.Post) {
+            call.response.headers["Location"]?.replace("http", "https")?.let { onNewBlobUrl(it) }
+        }
+        call
+    }
+    return client
 }
