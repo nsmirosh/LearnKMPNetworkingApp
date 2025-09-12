@@ -2,7 +2,11 @@ package com.learnkmp.networking.helpers
 
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.darwin.Darwin
-import kotlin.time.ExperimentalTime
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 
-@OptIn(ExperimentalTime::class)
-actual fun createPlatformHttpClient(): HttpClient = HttpClient(Darwin)
+actual fun createPlatformHttpClient(): HttpClient = HttpClient(Darwin) {
+    install(ContentNegotiation) {
+        json()
+    }
+}
