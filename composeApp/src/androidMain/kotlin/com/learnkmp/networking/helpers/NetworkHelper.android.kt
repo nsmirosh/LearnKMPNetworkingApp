@@ -6,11 +6,13 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.observer.ResponseObserver
 import io.ktor.client.plugins.plugin
+import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-actual fun createPlatformHttpClient(): HttpClient {
+actual fun createPlatformHttpClient(onNewBlobUrl: (String) -> Unit): HttpClient {
     val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             json(Json {
@@ -32,6 +34,13 @@ actual fun createPlatformHttpClient(): HttpClient {
         println("[HTTP] <- ${call.response.status.value} ${call.request.url}")
         val note = call.response.body<Note>()
         println("[HTTP] <- $note")
+        call
+    }
+    client.plugin(HttpSend).intercept { request ->
+        val call = execute(request)
+        if (request.method == HttpMethod.Post) {
+            call.response.headers["Location"]?.replace("http", "https")?.let { onNewBlobUrl(it) }
+        }
         call
     }
     return client

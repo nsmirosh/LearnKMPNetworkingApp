@@ -26,7 +26,12 @@ class NoteViewModel : ViewModel() {
     val statusMessage: StateFlow<String?> = _statusMessage.asStateFlow()
 
     val blobUrls = mutableListOf<String>()
-    val client = createPlatformHttpClient()
+    val client = createPlatformHttpClient { blobUrl ->
+        val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
+        blobUrls.clear()
+        blobUrls.addAll(newBlobUrls)
+        _statusMessage.value = "✅ Note sent successfully!"
+    }
 
     suspend fun fetchAllNotes() {
         try {
@@ -61,16 +66,9 @@ class NoteViewModel : ViewModel() {
                     metadata = metadata
                 )
 
-                val response = client.post(BLOB_WEBSITE_URL) {
+                client.post(BLOB_WEBSITE_URL) {
                     contentType(ContentType.Application.Json)
                     setBody(note)
-                }
-
-                response.headers["Location"]?.replace("http", "https")?.let { blobUrl ->
-                    val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
-                    blobUrls.clear()
-                    blobUrls.addAll(newBlobUrls)
-                    _statusMessage.value = "✅ Note sent successfully!"
                 }
 
                 // Fetch all notes after sending

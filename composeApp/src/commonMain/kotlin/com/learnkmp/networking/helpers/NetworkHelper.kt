@@ -1,4 +1,4 @@
 package com.learnkmp.networking.helpers
 import io.ktor.client.*
 
-expect fun createPlatformHttpClient(): HttpClient
+expect fun createPlatformHttpClient(onNewBlobUrl: (String) -> Unit = {}): HttpClient
