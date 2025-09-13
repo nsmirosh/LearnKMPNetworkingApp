@@ -2,6 +2,7 @@ package com.learnkmp.networking.helpers
 
 import com.learnkmp.networking.models.Note
 import io.ktor.client.HttpClient
+import io.ktor.client.call.HttpClientCall
 import io.ktor.client.call.body
 import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.plugins.HttpSend
@@ -49,7 +50,7 @@ actual fun createPlatformHttpClient2(onNewBlobUrl: (String) -> Unit): HttpClient
         println("[HTTP] -> ${request.method.value} ${request.url}")
         println("[HTTP] -> ${request.body}")
 
-        val call = execute(request)
+        val call: HttpClientCall = execute(request)
 
         // Simple response log
         println("[HTTP] <- ${call.response.status.value} ${call.request.url}")
