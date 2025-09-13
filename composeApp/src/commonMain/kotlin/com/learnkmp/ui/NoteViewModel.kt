@@ -1,7 +1,6 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.learnkmp.networking.helpers.createPlatformHttpClient
-import com.learnkmp.networking.helpers.createPlatformHttpClient2
 import com.learnkmp.networking.models.Note
 import com.learnkmp.networking.models.Metadata
 import io.ktor.client.call.body
@@ -27,7 +26,7 @@ class NoteViewModel : ViewModel() {
     val statusMessage: StateFlow<String?> = _statusMessage.asStateFlow()
 
     val blobUrls = mutableListOf<String>()
-    val client = createPlatformHttpClient2 { blobUrl ->
+    val client = createPlatformHttpClient { blobUrl ->
         val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
         blobUrls.clear()
         blobUrls.addAll(newBlobUrls)

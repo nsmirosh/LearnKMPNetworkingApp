@@ -12,28 +12,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-actual fun createPlatformHttpClient(onNewBlobUrl: (String) -> Unit): HttpClient =
-    HttpClient(OkHttp) {
-        install(ContentNegotiation) {
-            json(
-                Json {
-                    prettyPrint = true
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                }
-            )
-        }
-        install(ResponseObserver) {
-            onResponse { response ->
-                if (response.call.request.method == HttpMethod.Post) {
-                    response.headers["Location"]?.replace("http", "https")
-                        ?.let { onNewBlobUrl(it) }
-                }
-            }
-        }
-    }
-
-actual fun createPlatformHttpClient2(onNewBlobUrl: (String) -> Unit): HttpClient {
+actual fun createPlatformHttpClient(onNewBlobUrl: (String) -> Unit): HttpClient {
     val client = HttpClient(OkHttp) {
         install(ContentNegotiation) {
             json(Json {
