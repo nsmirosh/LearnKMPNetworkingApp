@@ -27,10 +27,7 @@ class NoteViewModel : ViewModel() {
 
     val blobUrls = mutableListOf<String>()
     val client = createPlatformHttpClient { blobUrl ->
-        val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
-        blobUrls.clear()
-        blobUrls.addAll(newBlobUrls)
-        _statusMessage.value = "✅ Note sent successfully!"
+        // TODO: Implement the callback logic here
     }
 
     suspend fun fetchAllNotes() {
@@ -66,9 +63,17 @@ class NoteViewModel : ViewModel() {
                     metadata = metadata
                 )
 
-                client.post(BLOB_WEBSITE_URL) {
+                val response = client.post(BLOB_WEBSITE_URL) {
                     contentType(ContentType.Application.Json)
                     setBody(note)
+                }
+
+                //TODO move the extraction logic to the interceptor and the update logic to the callback
+                response.headers["Location"]?.replace("http", "https")?.let { blobUrl ->
+                    val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
+                    blobUrls.clear()
+                    blobUrls.addAll(newBlobUrls)
+                    _statusMessage.value = "✅ Note sent successfully!"
                 }
 
                 // Fetch all notes after sending

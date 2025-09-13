@@ -8,7 +8,6 @@ import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.plugin
-import io.ktor.http.HttpMethod
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -21,16 +20,6 @@ actual fun createPlatformHttpClient(onNewBlobUrl: (String) -> Unit): HttpClient 
                 ignoreUnknownKeys = true
             })
         }
-
-        //Alternative to interceptor below
-//        install(ResponseObserver) {
-//            onResponse { response ->
-//                if (response.call.request.method == HttpMethod.Post) {
-//                    response.headers["Location"]?.replace("http", "https")
-//                        ?.let { onNewBlobUrl(it) }
-//                }
-//            }
-//        }
     }
 
     client.plugin(HttpSend).intercept { request ->
@@ -46,14 +35,9 @@ actual fun createPlatformHttpClient(onNewBlobUrl: (String) -> Unit): HttpClient 
         println("[HTTP] <- $note")
         call
     }
-    client.plugin(HttpSend).intercept { request ->
-        val call = execute(request)
-        if (request.method == HttpMethod.Post) {
-            call.response.headers["Location"]?.replace("http", "https")?.let { onNewBlobUrl(it) }
-        }
-        call
-    }
 
+    //TODO define your interceptor here and use the onNewBlobUrl() callback to update the blobUrls
+    // in the NoteViewModel
 
     return client
 }
