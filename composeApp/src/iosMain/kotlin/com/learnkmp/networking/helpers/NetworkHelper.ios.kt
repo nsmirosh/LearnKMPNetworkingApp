@@ -6,23 +6,4 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
-actual fun createPlatformHttpClient(): HttpClient = HttpClient(Darwin) {
-    engine {
-        //configure a challenge handler for NSURLSession.
-        handleChallenge {
-                        session,
-                        task,
-                        challenge,
-                        completionHandler ->
-        }
-    }
-}
-
-//    install(ContentNegotiation) {
-//        json(Json {
-//            prettyPrint = true
-//            isLenient = true
-//            ignoreUnknownKeys = true
-//        })
-//    }
-//}
+actual fun createPlatformHttpClient(): HttpClient = HttpClient(Darwin)
