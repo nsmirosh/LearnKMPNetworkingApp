@@ -1,5 +1,6 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.learnkmp.networking.helpers.createHttpClient
 import com.learnkmp.networking.helpers.createPlatformHttpClient
 import com.learnkmp.networking.models.Note
 import com.learnkmp.networking.models.Metadata
@@ -9,10 +10,13 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 const val BLOB_WEBSITE_URL = "https://www.jsonblob.com/api/jsonBlob"
 const val MAX_MESSAGES = 3
@@ -26,7 +30,7 @@ class NoteViewModel : ViewModel() {
     val statusMessage: StateFlow<String?> = _statusMessage.asStateFlow()
 
     val blobUrls = mutableListOf<String>()
-    val client = createPlatformHttpClient()
+    val client = createHttpClient()
 
     suspend fun fetchAllNotes() {
         try {
@@ -36,18 +40,22 @@ class NoteViewModel : ViewModel() {
                     val note: Note = client.get(url).body()
                     fetchedNotes.add(note)
                 } catch (e: Exception) {
-                    // Ignore individual fetch failures
+                    println("Failed to fetch note from $url: ${e.message}")
+                    println(e.printStackTrace())
                 }
             }
-            _notes.value = fetchedNotes
+            withContext(Dispatchers.Main) {
+                _notes.value = fetchedNotes
+            }
         } catch (e: Exception) {
             _statusMessage.value = "❌ Failed to fetch notes: ${e.message}"
         }
     }
 
     fun sendNote(message: String, author: String, tags: String = "") {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
+                client.get("https://www.jsonblob.com/")
                 val tagsList = if (tags.isBlank()) null else tags.split(",").map { it.trim() }
                     .filter { it.isNotEmpty() }
 
