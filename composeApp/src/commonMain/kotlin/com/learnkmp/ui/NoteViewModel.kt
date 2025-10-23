@@ -1,11 +1,8 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.learnkmp.networking.BuildKonfig
 import com.learnkmp.networking.helpers.createHttpClient
-import com.learnkmp.networking.helpers.createPlatformHttpClient
-import com.learnkmp.networking.models.Note
 import com.learnkmp.networking.models.Metadata
-import com.learnkmp.networking.models.Note2
+import com.learnkmp.networking.models.Note
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -14,6 +11,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,9 +37,9 @@ class NoteViewModel : ViewModel() {
             val fetchedNotes = mutableListOf<Note>()
             blobUrls.forEach { url ->
                 try {
-                    val note: Note2 = client.get(url).body()
+                    val note: Note = client.get(url).body()
                     println("Note: $note")
-//                    fetchedNotes.add(note)
+                    fetchedNotes.add(note)
                 } catch (e: Exception) {
                     println("Failed to fetch note from $url: ${e.message}")
                     println(e.printStackTrace())
@@ -55,19 +53,7 @@ class NoteViewModel : ViewModel() {
         }
     }
 
-    private fun sendMockNote() {
-        viewModelScope.launch{
-            val note2: Note2 =  client.get("blah").body()
-            println("received = $note2")
-        }
-
-    }
-
     fun sendNote(message: String, author: String, tags: String = "") {
-        if (BuildKonfig.useMockServer) {
-            sendMockNote()
-            return
-        }
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val tagsList = if (tags.isBlank()) null else tags.split(",").map { it.trim() }
@@ -83,13 +69,10 @@ class NoteViewModel : ViewModel() {
                     metadata = metadata
                 )
 
-
                 val response = client.post(BLOB_WEBSITE_URL) {
                     contentType(ContentType.Application.Json)
                     setBody(note)
                 }
-
-
                 response.headers["Location"]?.replace("http", "https")?.let { blobUrl ->
                     val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
                     blobUrls.clear()

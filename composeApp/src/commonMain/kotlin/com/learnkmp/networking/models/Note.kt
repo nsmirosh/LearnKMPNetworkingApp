@@ -13,7 +13,3 @@ data class Note(
     val author: String? = null,
     val metadata: Metadata
 )
-@Serializable
-data class Note2(
-    val message: String,
-)
