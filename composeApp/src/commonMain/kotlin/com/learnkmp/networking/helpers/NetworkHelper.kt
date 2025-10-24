@@ -43,34 +43,46 @@ private fun buildMockClient(): HttpClient {
             is io.ktor.http.content.ByteArrayContent -> content.bytes().decodeToString()
             else -> content.toString()
         }
+        val (content, headers) = when (request.method) {
+            io.ktor.http.HttpMethod.Get -> {
+                delay(500)
+                val path = request.url.toString()
 
-        val (content, headers) = if (request.method == io.ktor.http.HttpMethod.Get) {
-            delay(500)
-            val path = request.url.toString()
-
-            Pair(
-                Json.encodeToString(
-                    Note.serializer(),
-                    blobUrlsWithBlobData[path] as Note
-                ),
-                headersOf(HttpHeaders.ContentType, "application/json")
-            )
-        } else {
-            val blobUrl = "http://www.jsonblob.com/api/jsonBlob/${latestBlobId++}"
-            val newBlobUrl = blobUrl.replace("http", "https")
-            val note = Json.decodeFromString(Note.serializer(), body)
-            blobUrlsWithBlobData[newBlobUrl] = note
-            Pair(
-                "",
-                headersOf(
-                    Pair(HttpHeaders.ContentType, listOf("application/json")),
-                    Pair("Location", listOf(blobUrl))
+                Pair(
+                    Json.encodeToString(
+                        Note.serializer(),
+                        blobUrlsWithBlobData[path] as Note
+                    ),
+                    headersOf(HttpHeaders.ContentType, "application/json")
                 )
-            )
+            }
+
+            io.ktor.http.HttpMethod.Post -> {
+                val blobUrl = "http://www.jsonblob.com/api/jsonBlob/${latestBlobId++}"
+                val newBlobUrl = blobUrl.replace("http", "https")
+                val note = Json.decodeFromString(Note.serializer(), body)
+                blobUrlsWithBlobData[newBlobUrl] = note
+                Pair(
+                    "",
+                    headersOf(
+                        Pair(HttpHeaders.ContentType, listOf("application/json")),
+                        Pair("Location", listOf(blobUrl))
+                    )
+                )
+            }
+
+//            io.ktor.http.HttpMethod.Put -> {
+//
+//            }
+//
+//            io.ktor.http.HttpMethod.Delete -> {
+//
+//            }
+//
+//            else -> {
+//                // Handle other HTTP methods
+//            }
         }
-        respond(
-            content = content,
-            headers = headers
-        )
-    })
+
+    }
 }
