@@ -62,9 +62,9 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.client.logging)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.mock.engine)
             implementation(libs.kotlinx.datetime)
             implementation(libs.viewmodel)
-            implementation("io.ktor:ktor-client-mock:3.3.1")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
