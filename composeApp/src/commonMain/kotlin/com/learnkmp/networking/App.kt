@@ -21,6 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -43,10 +47,23 @@ fun App() {
 @Composable
 @Preview
 fun MessageBoardScreen() {
-    val client = remember { HttpClient(CIO) }
+    val client = remember {
+        HttpClient(CIO) {
+            install(Logging) {
+                level = LogLevel.ALL
+                logger = Logger.SIMPLE
+
+            }
+        }
+    }
+//    val client = remember { MockHttpClient() }
     var message by remember { mutableStateOf("") }
     var statusMessage by remember { mutableStateOf("") }
     var blobUrl by remember { mutableStateOf<String?>(null) }
+//    var blobUrl: String? by ClientProperty(
+//        getter = { client.blobUrl },
+//        setter = { client.blobUrl = it }
+//    )
     val coroutineScope = rememberCoroutineScope()
 
     // Helper function to handle API operations - no need to modify
@@ -115,13 +132,14 @@ fun MessageBoardScreen() {
                 //TODO
                 // In order for us to work with something
                 // We first need to post a value
-                // Your task is to make a POST request to https://www.jsonblob.com/api/jsonBlob
+                // Your task is to make a POST request to https://api.jsonblob.com
                 // The content type should be JSON
                 // In the body you should put the `createJsonBody()` function that
                 // we created above which will take what we have in our TextField
                 // and package it into the JSON format
 
-                val response = client.post("https://www.jsonblob.com/api/jsonBlob") {
+
+                val response = client.post("https://api.jsonblob.com") {
                     contentType(ContentType.Application.Json)
                     setBody(createJsonBody())
                 }
@@ -132,10 +150,8 @@ fun MessageBoardScreen() {
                 // We need to save this URL in order to perform further operations
                 // Your job is to retrieve this from the header and save it into the
                 // `blobUrl` variable that we have at the start of MessageBoardScreen above.
-                // IMPORTANT(!) - once you retrieve the URL from the header
-                // Before storing it you will need to replace "http" with "https" for redirection.
 
-                blobUrl = response.headers["Location"]?.replace("http", "https")
+                blobUrl = "https://api.jsonblob.com/${response.headers["Location"]}"
 
 
                 //TODO uncomment this once you implement the above functionality
