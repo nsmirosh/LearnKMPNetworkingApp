@@ -21,10 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -47,15 +43,7 @@ fun App() {
 @Composable
 @Preview
 fun MessageBoardScreen() {
-    val client = remember {
-        HttpClient(CIO) {
-            install(Logging) {
-                level = LogLevel.ALL
-                logger = Logger.SIMPLE
-
-            }
-        }
-    }
+    val client = remember { HttpClient(CIO) }
     var message by remember { mutableStateOf("") }
     var statusMessage by remember { mutableStateOf("") }
     var blobUrl by remember { mutableStateOf<String?>(null) }
