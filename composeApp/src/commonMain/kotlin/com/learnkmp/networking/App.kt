@@ -129,6 +129,8 @@ fun MessageBoardScreen() {
             }
 
             ApiButton("POST") {
+
+
                 //TODO
                 // In order for us to work with something
                 // We first need to post a value
@@ -146,10 +148,9 @@ fun MessageBoardScreen() {
 
                 //TODO
                 // After you have implemented the call above and got the response
-                // in the header of your response you will get a URL of where our JSON will be stored
-                // We need to save this URL in order to perform further operations
-                // Your job is to retrieve this from the header and save it into the
-                // `blobUrl` variable that we have at the start of MessageBoardScreen above.
+                // in the Location header of your response you will get the Blob ID
+                // of where JSON will be stored
+                // Store this id in the blobUrl variable above like so  "https://api.jsonblob.com/${blobId}}"
 
                 blobUrl = "https://api.jsonblob.com/${response.headers["Location"]}"
 
