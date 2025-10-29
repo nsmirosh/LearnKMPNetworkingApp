@@ -8,14 +8,11 @@ androidx-lifecycle = "2.9.5"
 composeMultiplatform = "1.9.1"
 kotlin = "2.2.21"
 ktor = "3.3.1"
-dateTime = "0.7.1"
 kotlinxSerialization = "1.9.0"
 
 
 [libraries]
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
-ktor-client-mock-engine = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-cio-engine = { module = "io.ktor:ktor-client-cio", version.ref = "ktor"}
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }

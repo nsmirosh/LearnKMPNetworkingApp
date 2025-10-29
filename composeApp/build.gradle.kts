@@ -44,9 +44,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.cio.engine)
-            implementation(libs.ktor.client.mock.engine)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.ktor.client.logging)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
