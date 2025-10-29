@@ -97,18 +97,17 @@ fun MessageBoardScreen() {
             ApiButton("GET", requiresBlobUrl = true) {
                 blobUrl?.let { url ->
                     val response = client.get(url).bodyAsText()
-
                     statusMessage = "✅ GET success: $response"
                 }
             }
 
             ApiButton("POST") {
-                val response = client.post("https://www.jsonblob.com/api/jsonBlob") {
+                val response = client.post("https://api.jsonblob.com") {
                     contentType(ContentType.Application.Json)
                     setBody(createJsonBody())
                 }
 
-                blobUrl = response.headers["Location"]?.replace("http", "https")
+                blobUrl = "https://api.jsonblob.com/${response.headers["Location"]}"
 
                 statusMessage = "✅ POST success! Blob created with URL = $blobUrl"
             }
