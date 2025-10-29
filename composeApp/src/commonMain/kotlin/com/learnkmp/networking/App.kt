@@ -105,7 +105,7 @@ fun MessageBoardScreen() {
                 //TODO
                 // In order for us to work with something
                 // We first need to post a value
-                // Your task is to make a POST request to https://www.jsonblob.com/api/jsonBlob
+                // Your task is to make a POST request to https://api.jsonblob.com
                 // The content type should be JSON
                 // In the body you should put the `createJsonBody()` function that
                 // we created above which will take what we have in our TextField
@@ -113,15 +113,11 @@ fun MessageBoardScreen() {
 
                 //implement here
 
-
                 //TODO
                 // After you have implemented the call above and got the response
-                // in the header of your response you will get a URL of where our JSON will be stored
-                // We need to save this URL in order to perform further operations
-                // Your job is to retrieve this from the header and save it into the
-                // `blobUrl` variable that we have at the start of MessageBoardScreen above.
-                // IMPORTANT(!) - once you retrieve the URL from the header
-                // Before storing it you will need to replace "http" with "https" for redirection.
+                // in the Location header of your response you will get the Blob ID
+                // of where JSON will be stored
+                // Store this id in the blobUrl variable above like so  "https://api.jsonblob.com/${blobId}}"
 
                 //TODO uncomment this once you implement the above functionality
 //                statusMessage = "✅ POST success! Blob created with URL = $blobUrl"
