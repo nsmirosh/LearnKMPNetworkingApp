@@ -56,14 +56,9 @@ fun MessageBoardScreen() {
             }
         }
     }
-//    val client = remember { MockHttpClient() }
     var message by remember { mutableStateOf("") }
     var statusMessage by remember { mutableStateOf("") }
     var blobUrl by remember { mutableStateOf<String?>(null) }
-//    var blobUrl: String? by ClientProperty(
-//        getter = { client.blobUrl },
-//        setter = { client.blobUrl = it }
-//    )
     val coroutineScope = rememberCoroutineScope()
 
     // Helper function to handle API operations - no need to modify
