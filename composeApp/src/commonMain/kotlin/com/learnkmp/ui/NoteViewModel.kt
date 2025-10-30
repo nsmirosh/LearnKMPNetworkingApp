@@ -8,12 +8,13 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-const val BLOB_WEBSITE_URL = "https://www.jsonblob.com/api/jsonBlob"
+const val BLOB_WEBSITE_URL = "https://api.jsonblob.com"
 const val MAX_MESSAGES = 3
 
 class NoteViewModel : ViewModel() {
@@ -31,6 +32,7 @@ class NoteViewModel : ViewModel() {
         try {
             val fetchedNotes = mutableListOf<Note>()
             blobUrls.forEach { url ->
+                delay(200L)
                 try {
                     val note: Note = client.get(url).body()
                     fetchedNotes.add(note)
@@ -63,8 +65,9 @@ class NoteViewModel : ViewModel() {
                     setBody(note)
                 }
 
-                response.headers["Location"]?.replace("http", "https")?.let { blobUrl ->
-                    val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
+                response.headers["Location"]?.let { blobUrl ->
+                    blobUrls.add("$BLOB_WEBSITE_URL/$blobUrl")
+                    val newBlobUrls = blobUrls.takeLast(MAX_MESSAGES)
                     blobUrls.clear()
                     blobUrls.addAll(newBlobUrls)
                     _statusMessage.value = "✅ Note sent successfully!"
