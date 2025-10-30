@@ -1,7 +1,6 @@
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.learnkmp.networking.helpers.createHttpClient
-import com.learnkmp.networking.helpers.createPlatformHttpClient
 import com.learnkmp.networking.models.Note
 import com.learnkmp.networking.models.Metadata
 import io.ktor.client.call.body
@@ -12,13 +11,14 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-const val BLOB_WEBSITE_URL = "https://www.jsonblob.com/api/jsonBlob"
+const val BLOB_WEBSITE_URL = "https://api.jsonblob.com"
 const val MAX_MESSAGES = 3
 
 class NoteViewModel : ViewModel() {
@@ -36,6 +36,8 @@ class NoteViewModel : ViewModel() {
         try {
             val fetchedNotes = mutableListOf<Note>()
             blobUrls.forEach { url ->
+
+                delay(200L) // Adding a small delay to avoid getting blocked by cloudfare on jsonblob.com
                 try {
                     val note: Note = client.get(url).body()
                     fetchedNotes.add(note)
@@ -55,7 +57,6 @@ class NoteViewModel : ViewModel() {
     fun sendNote(message: String, author: String, tags: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                client.get("https://www.jsonblob.com/")
                 val tagsList = if (tags.isBlank()) null else tags.split(",").map { it.trim() }
                     .filter { it.isNotEmpty() }
 
@@ -74,8 +75,9 @@ class NoteViewModel : ViewModel() {
                     setBody(note)
                 }
 
-                response.headers["Location"]?.replace("http", "https")?.let { blobUrl ->
-                    val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
+                response.headers["Location"]?.let { blobUrl ->
+                    blobUrls.add("$BLOB_WEBSITE_URL/$blobUrl")
+                    val newBlobUrls = blobUrls.takeLast(MAX_MESSAGES)
                     blobUrls.clear()
                     blobUrls.addAll(newBlobUrls)
                     _statusMessage.value = "✅ Note sent successfully!"
