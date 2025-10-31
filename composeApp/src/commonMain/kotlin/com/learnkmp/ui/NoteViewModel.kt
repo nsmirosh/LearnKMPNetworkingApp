@@ -1,3 +1,7 @@
+
+
+package com.learnkmp.ui
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.learnkmp.networking.helpers.createHttpClient
@@ -18,7 +22,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-const val BLOB_WEBSITE_URL = "https://www.jsonblob.com/api/jsonBlob"
+const val BLOB_WEBSITE_URL = "https://api.jsonblob.com"
 const val MAX_MESSAGES = 3
 
 class NoteViewModel : ViewModel() {
@@ -73,8 +77,10 @@ class NoteViewModel : ViewModel() {
                     contentType(ContentType.Application.Json)
                     setBody(note)
                 }
-                response.headers["Location"]?.replace("http", "https")?.let { blobUrl ->
-                    val newBlobUrls = (blobUrls + blobUrl).takeLast(MAX_MESSAGES)
+
+                response.headers["Location"]?.let { blobUrl ->
+                    blobUrls.add("$BLOB_WEBSITE_URL/$blobUrl")
+                    val newBlobUrls = blobUrls.takeLast(MAX_MESSAGES)
                     blobUrls.clear()
                     blobUrls.addAll(newBlobUrls)
                     _statusMessage.value = "✅ Note sent successfully!"

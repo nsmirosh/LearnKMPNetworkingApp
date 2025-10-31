@@ -35,7 +35,7 @@ fun createHttpClient() =
 
 private fun buildMockClient(): HttpClient {
 
-    var blobUrlsWithBlobData = mutableMapOf<String, Note>()
+    val blobUrlsWithBlobData = mutableMapOf<Int, Note>()
     var latestBlobId = 1
     return HttpClient(MockEngine { request ->
         val body = when (val content = request.body) {
@@ -47,42 +47,36 @@ private fun buildMockClient(): HttpClient {
             io.ktor.http.HttpMethod.Get -> {
                 delay(500)
                 val path = request.url.toString()
+                val pathParts = path.split("/")
+                val blobId = pathParts[pathParts.lastIndex].toInt()
 
                 Pair(
                     Json.encodeToString(
                         Note.serializer(),
-                        blobUrlsWithBlobData[path] as Note
+                        blobUrlsWithBlobData[blobId] as Note
                     ),
                     headersOf(HttpHeaders.ContentType, "application/json")
                 )
             }
 
-            io.ktor.http.HttpMethod.Post -> {
-                val blobUrl = "http://www.jsonblob.com/api/jsonBlob/${latestBlobId++}"
-                val newBlobUrl = blobUrl.replace("http", "https")
+            else-> {
+                //We're only using two methods so it's fine to put this inside an else
                 val note = Json.decodeFromString(Note.serializer(), body)
-                blobUrlsWithBlobData[newBlobUrl] = note
+                blobUrlsWithBlobData[latestBlobId] = note
                 Pair(
                     "",
                     headersOf(
                         Pair(HttpHeaders.ContentType, listOf("application/json")),
-                        Pair("Location", listOf(blobUrl))
+                        Pair("Location", listOf("${latestBlobId++}"))
                     )
                 )
             }
-
-//            io.ktor.http.HttpMethod.Put -> {
-//
-//            }
-//
-//            io.ktor.http.HttpMethod.Delete -> {
-//
-//            }
-//
-//            else -> {
-//                // Handle other HTTP methods
-//            }
         }
 
-    }
+        respond(
+            content = content,
+            headers = headers
+        )
+
+    })
 }
