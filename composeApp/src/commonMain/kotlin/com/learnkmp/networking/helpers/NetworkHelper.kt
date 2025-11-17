@@ -24,6 +24,9 @@ fun createHttpClient() =
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true
+                    ignoreUnknownKeys = true
+                    coerceInputValues = true
+                    isLenient = true
                 })
             }
             install(Logging) {
