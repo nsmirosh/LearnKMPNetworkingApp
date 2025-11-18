@@ -64,6 +64,7 @@ kotlin {
             implementation(libs.ktor.client.mock.engine)
             implementation(libs.kotlinx.datetime)
             implementation(libs.viewmodel)
+            implementation(libs.coil.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

@@ -3,10 +3,12 @@ package com.learnkmp.networking
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -24,8 +26,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.ColorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
+import com.learnkmp.networking.models.Metadata
 import com.learnkmp.networking.models.Note
 import com.learnkmp.ui.NoteViewModel
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -134,11 +142,28 @@ fun NoteCard(note: Note) {
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = note.message,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+
+            Row {
+                AsyncImage(
+                    model = note.imageUrl,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(84.dp)
+                        .clip(RoundedCornerShape(10.dp)),
+                    contentScale = ContentScale.Crop,
+                    placeholder = ColorPainter(Color.Gray),
+                    error = ColorPainter(Color.Black),
+                    onError = {
+                        println(it.result.throwable.printStackTrace())
+                    }
+                )
+
+                Text(
+                    text = note.message,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(bottom = 8.dp, start = 16.dp)
+                )
+            }
 
             if (note.author != null) {
                 Text(
@@ -154,6 +179,22 @@ fun NoteCard(note: Note) {
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun NoteCardPreview() {
+    NoteCard(
+        note = Note(
+            message = "This is a note",
+            author = "John Doe",
+
+
+            metadata = Metadata(
+                tags = listOf("work", "urgent", "ideas")
+            )
+        )
+    )
 }
 
 

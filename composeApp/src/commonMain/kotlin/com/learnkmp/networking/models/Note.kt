@@ -11,5 +11,6 @@ data class Metadata(
 data class Note(
     val message: String,
     val author: String? = null,
+    val imageUrl: String = "https://picsum.photos/300/200", // getting a random image
     val metadata: Metadata
 )
