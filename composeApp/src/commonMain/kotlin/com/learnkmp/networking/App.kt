@@ -22,7 +22,6 @@ import kmpnetworkingapp.composeapp.generated.resources.compose_multiplatform
 @Preview
 fun App() {
     MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
                 .safeContentPadding()
