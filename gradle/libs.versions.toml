@@ -1,19 +1,19 @@
 [versions]
-agp = "8.13.0"
+agp = "8.11.1"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
-androidx-activity = "1.11.0"
-androidx-lifecycle = "2.9.5"
-composeMultiplatform = "1.9.1"
-kotlin = "2.2.21"
-ktor = "3.3.1"
-kotlinxSerialization = "1.9.0"
+androidx-activity = "1.12.4"
+androidx-lifecycle = "2.9.6"
+composeMultiplatform = "1.10.2"
+kotlin = "2.3.10"
+ktor = "3.4.1"
+kotlinxSerialization = "1.10.0"
 
 
 [libraries]
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-cio-engine = { module = "io.ktor:ktor-client-cio", version.ref = "ktor"}
+ktor-cio-engine = {module = "io.ktor:ktor-client-cio", version.ref = "ktor"}
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-lifecycle-runtimeCompose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
