@@ -7,11 +7,8 @@ androidx-activity = "1.12.4"
 androidx-lifecycle = "2.9.6"
 composeMultiplatform = "1.10.2"
 kotlin = "2.3.10"
-ktor = "3.4.1"
 
 [libraries]
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-cio-engine = {module = "io.ktor:ktor-client-cio", version.ref = "ktor"}
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
