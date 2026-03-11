@@ -65,6 +65,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.viewmodel)
             implementation(libs.coil.compose)
+            implementation(libs.coil.network)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
